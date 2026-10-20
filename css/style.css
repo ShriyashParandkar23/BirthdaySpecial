@@ -1,0 +1,952 @@
+/* ============================================================================
+   style.css — A Birthday Surprise
+   ----------------------------------------------------------------------------
+   Palette : deep wine night · blush pink · ivory · champagne gold
+   Type    : Great Vibes (script) · Cormorant Infant (serif) · Jost (modern)
+   Contents
+     01 Tokens
+     02 Reset & base
+     03 Atmosphere (glow, stars, hearts, petals, vignette)
+     04 Progress thread
+     05 Shared pieces (kicker, headings, rule, buttons, reveal)
+     06 Welcome gate
+     07 Filmstrip carousel
+     08 Hero message frame
+     09 Letter
+     10 Memories
+     11 Finale
+     12 Floating controls
+     13 Responsive
+     14 Reduced motion
+   ========================================================================== */
+
+/* ------------------------------ 01 Tokens -------------------------------- */
+:root {
+  /* surfaces */
+  --wine-950: #0E0409;
+  --wine-900: #160711;
+  --wine-800: #220C1A;
+  --wine-700: #2E1024;
+
+  /* romance */
+  --blush:     #F9A8C4;
+  --rose:      #DB2777;
+  --rose-soft: #F472B6;
+  --gold:      #E8C98A;
+  --gold-deep: #CA8A04;
+
+  /* text on dark */
+  --ivory:       #FFF8F3;
+  --ivory-dim:   rgba(255, 248, 243, 0.78);
+  --ivory-soft:  rgba(255, 248, 243, 0.58);
+  --ivory-faint: rgba(255, 248, 243, 0.34);
+
+  /* glass */
+  --glass:        rgba(255, 248, 243, 0.055);
+  --glass-strong: rgba(255, 248, 243, 0.085);
+  --hairline:     rgba(255, 248, 243, 0.16);
+  --hairline-lit: rgba(255, 248, 243, 0.42);
+
+  /* type */
+  --font-script: "Great Vibes", "Brush Script MT", cursive;
+  --font-serif:  "Cormorant Infant", Georgia, "Times New Roman", serif;
+  --font-sans:   "Jost", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* motion */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --slow: 620ms;
+
+  /* z-index scale */
+  --z-atmosphere: 0;
+  --z-stage: 10;
+  --z-progress: 20;
+  --z-controls: 30;
+  --z-gate: 50;
+}
+
+/* ---------------------------- 02 Reset & base ---------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;              /* 17px — comfortably above the 16px floor */
+  line-height: 1.7;
+  color: var(--ivory-dim);
+  background-color: var(--wine-900);
+  background-image:
+    radial-gradient(115% 80% at 50% -15%, #3A1226 0%, rgba(58, 18, 38, 0) 60%),
+    radial-gradient(90% 60% at 100% 100%, #2A0C1D 0%, rgba(42, 12, 29, 0) 55%),
+    linear-gradient(180deg, var(--wine-900) 0%, var(--wine-950) 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.is-locked { overflow: hidden; }
+
+img { display: block; max-width: 100%; }
+
+h1, h2, h3 { margin: 0; font-weight: 400; }
+p { margin: 0; }
+
+.script { font-family: var(--font-script); font-weight: 400; }
+
+/* Everything interactive gets a visible, on-brand focus ring */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.wrap {
+  width: min(1120px, 100% - 2.5rem);
+  margin-inline: auto;
+}
+.wrap--narrow { width: min(680px, 100% - 2.5rem); }
+
+/* ---------------------------- 03 Atmosphere ------------------------------ */
+.atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-atmosphere);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.atmosphere__glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.5;
+  will-change: transform;
+}
+.atmosphere__glow--rose {
+  width: 46vmax; height: 46vmax;
+  top: -14vmax; left: -10vmax;
+  background: radial-gradient(circle, rgba(219, 39, 119, 0.42), transparent 70%);
+  animation: drift-a 34s var(--ease) infinite alternate;
+}
+.atmosphere__glow--gold {
+  width: 38vmax; height: 38vmax;
+  bottom: -12vmax; right: -8vmax;
+  background: radial-gradient(circle, rgba(232, 201, 138, 0.26), transparent 70%);
+  animation: drift-b 42s var(--ease) infinite alternate;
+}
+.atmosphere__glow--blush {
+  width: 30vmax; height: 30vmax;
+  top: 42%; left: 58%;
+  background: radial-gradient(circle, rgba(249, 168, 196, 0.2), transparent 70%);
+  animation: drift-a 50s var(--ease) infinite alternate-reverse;
+}
+
+@keyframes drift-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(6vmax, 4vmax, 0) scale(1.14); }
+}
+@keyframes drift-b {
+  from { transform: translate3d(0, 0, 0) scale(1.1); }
+  to   { transform: translate3d(-7vmax, -3vmax, 0) scale(1); }
+}
+
+.atmosphere__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(130% 95% at 50% 45%, transparent 42%, rgba(14, 4, 9, 0.72) 100%);
+}
+
+/* stars ------------------------------------------------------------------ */
+.sky { position: absolute; inset: 0; }
+
+.star {
+  position: absolute;
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: var(--ivory);
+  opacity: 0.1;
+  box-shadow: 0 0 6px rgba(255, 248, 243, 0.75);
+  animation: twinkle var(--dur) ease-in-out infinite alternate;
+  animation-delay: var(--delay);
+}
+.star--gold { background: var(--gold); box-shadow: 0 0 7px rgba(232, 201, 138, 0.8); }
+.star--rose { background: var(--blush); box-shadow: 0 0 7px rgba(249, 168, 196, 0.8); }
+
+@keyframes twinkle {
+  from { opacity: 0.08; }
+  to   { opacity: var(--peak, 0.85); }
+}
+
+/* floating hearts -------------------------------------------------------- */
+.hearts { position: absolute; inset: 0; }
+
+.heart {
+  position: absolute;
+  bottom: -8vh;
+  left: var(--x);
+  color: var(--blush);
+  opacity: 0;
+  animation: rise var(--dur) linear infinite;
+  animation-delay: var(--delay);
+  will-change: transform, opacity;
+}
+.heart--gold { color: var(--gold); }
+
+@keyframes rise {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.7); opacity: 0; }
+  12%  { opacity: var(--peak, 0.5); }
+  50%  { transform: translate3d(var(--sway, 3vw), -58vh, 0) rotate(14deg) scale(1); }
+  88%  { opacity: var(--peak, 0.5); }
+  100% { transform: translate3d(calc(var(--sway, 3vw) * -0.6), -118vh, 0) rotate(-10deg) scale(0.85); opacity: 0; }
+}
+
+/* rose petals — only during the birthday reveal --------------------------- */
+.petals { position: absolute; inset: 0; }
+
+.petal {
+  position: absolute;
+  top: -6vh;
+  left: var(--x);
+  width: var(--s);
+  height: calc(var(--s) * 0.72);
+  border-radius: 60% 40% 55% 45% / 60% 55% 45% 40%;
+  background: linear-gradient(135deg, var(--blush), var(--rose));
+  opacity: 0;
+  animation: fall var(--dur) var(--ease) forwards;
+  animation-delay: var(--delay);
+  will-change: transform, opacity;
+}
+.petal--gold { background: linear-gradient(135deg, #F6E3BD, var(--gold-deep)); }
+
+@keyframes fall {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.85; }
+  100% { transform: translate3d(var(--sway, 8vw), 112vh, 0) rotate(var(--spin, 420deg)); opacity: 0; }
+}
+
+/* ------------------------- 04 Progress thread ---------------------------- */
+.progress {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  z-index: var(--z-progress);
+  background: rgba(255, 248, 243, 0.06);
+  opacity: 0;
+  transition: opacity 600ms var(--ease);
+}
+.progress.is-on { opacity: 1; }
+
+.progress__bar {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--rose), var(--gold));
+  box-shadow: 0 0 12px rgba(232, 201, 138, 0.6);
+}
+
+/* -------------------------- 05 Shared pieces ----------------------------- */
+.kicker {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.85;
+  margin-bottom: 1.1rem;
+}
+
+.section {
+  position: relative;
+  z-index: var(--z-stage);
+  padding: clamp(5rem, 13vh, 9rem) 0;
+}
+
+.section__heading {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5.4vw, 3.25rem);
+  font-weight: 300;
+  line-height: 1.18;
+  letter-spacing: 0.01em;
+  color: var(--ivory);
+}
+
+.section__sub {
+  margin-top: 1rem;
+  max-width: 46ch;              /* keeps lines in the readable 65–75 char band */
+  color: var(--ivory-soft);
+  font-size: 1.0625rem;
+}
+
+.rule {
+  margin: 1.75rem 0 2.25rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--hairline), transparent);
+  position: relative;
+}
+.rule span {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 5px; height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 10px rgba(232, 201, 138, 0.9);
+}
+
+/* buttons ---------------------------------------------------------------- */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;                        /* ≥44px touch target */
+  padding: 0.9rem 2.1rem;
+  border: 1px solid var(--hairline-lit);
+  border-radius: 999px;
+  overflow: hidden;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  color: var(--ivory);
+  background:
+    linear-gradient(180deg, rgba(255, 248, 243, 0.14), rgba(255, 248, 243, 0.04));
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 0 0 1px rgba(232, 201, 138, 0.18),
+    0 18px 50px -18px rgba(219, 39, 119, 0.55),
+    inset 0 1px 0 rgba(255, 248, 243, 0.22);
+  transition:
+    background-color 240ms var(--ease),
+    border-color 240ms var(--ease),
+    box-shadow 240ms var(--ease),
+    color 240ms var(--ease);
+}
+.btn:hover {
+  border-color: var(--gold);
+  background-color: rgba(232, 201, 138, 0.1);
+  box-shadow:
+    0 0 0 1px rgba(232, 201, 138, 0.42),
+    0 22px 60px -16px rgba(219, 39, 119, 0.75),
+    inset 0 1px 0 rgba(255, 248, 243, 0.3);
+}
+.btn:active { background-color: rgba(232, 201, 138, 0.16); }
+
+.btn__label { position: relative; z-index: 1; }
+
+/* a slow champagne sweep across the button */
+.btn__shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 248, 243, 0.34) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: sweep 4.6s var(--ease) infinite;
+}
+@keyframes sweep {
+  0%, 55%  { transform: translateX(-120%); }
+  100%     { transform: translateX(120%); }
+}
+
+.btn--ghost {
+  margin-top: 2.5rem;
+  box-shadow: 0 0 0 1px rgba(232, 201, 138, 0.14), inset 0 1px 0 rgba(255, 248, 243, 0.16);
+  background: var(--glass);
+}
+
+/* scroll reveal ---------------------------------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+  transition: opacity var(--slow) var(--ease), transform var(--slow) var(--ease);
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* --------------------------- 06 Welcome gate ----------------------------- */
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-gate);
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.25rem;
+  text-align: center;
+  background:
+    radial-gradient(85% 60% at 50% 42%, rgba(46, 16, 36, 0.86), rgba(14, 4, 9, 0.96));
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: opacity 900ms var(--ease), transform 900ms var(--ease), visibility 900ms;
+}
+.gate.is-open {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(1.06);
+  pointer-events: none;
+}
+
+.gate__inner {
+  max-width: 34rem;
+  animation: lift 1400ms var(--ease) both;
+}
+@keyframes lift {
+  from { opacity: 0; transform: translate3d(0, 22px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+.gate__title {
+  font-size: clamp(2.5rem, 9vw, 4.5rem);
+  line-height: 1.22;
+  color: var(--ivory);
+  text-shadow: 0 0 44px rgba(249, 168, 196, 0.45), 0 0 90px rgba(219, 39, 119, 0.3);
+  margin-bottom: 1.4rem;
+}
+
+.gate__sub {
+  font-size: 1.0625rem;
+  font-style: italic;
+  color: var(--ivory-soft);
+  margin-bottom: 2.6rem;
+}
+
+.gate__hint {
+  margin-top: 1.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  letter-spacing: 0.16em;
+  color: var(--blush);
+  animation: pulse 2.6s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+
+.gate__seal {
+  position: absolute;
+  bottom: clamp(1.5rem, 5vh, 3rem);
+  color: var(--gold);
+  opacity: 0.4;
+}
+
+/* ------------------------ 07 Filmstrip carousel -------------------------- */
+.strip {
+  --unit: clamp(165px, 24vw, 250px);
+  position: relative;
+  z-index: var(--z-stage);
+  overflow: hidden;
+  padding: 1.25rem 0;
+  /* soft fade at both ends so photos drift in and out of the dark */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+
+.strip__track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: marquee var(--dur, 70s) linear infinite;
+  will-change: transform;
+}
+
+/* The track holds the photos twice over, so -50% lands on an identical
+   frame and the loop is seamless — no jump, no gap. */
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+/* The memories wall: five shorter rows stacked close together, so a lot of
+   her photos are on screen at once rather than one row at a time. */
+.strips {
+  position: relative;
+  z-index: var(--z-stage);
+  display: grid;
+  gap: 5px;
+}
+
+/* In the wall, --unit is the row HEIGHT rather than a frame width. Every frame
+   is the same height and takes its width from its own shape, so the rows pack
+   tightly instead of leaving air above and below the short landscape frames. */
+.strip--wall {
+  --unit: clamp(168px, 25vw, 260px);
+  padding: 0;
+
+  /* The rows drift on their own, but they can also be swiped or dragged. */
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  cursor: grab;
+}
+.strip--wall::-webkit-scrollbar { display: none; }
+.strip--wall.is-dragging { cursor: grabbing; }
+.strip--wall.is-dragging .tile__inner { cursor: grabbing; }
+
+.strip--wall .tile { --space: 5px; }
+.strip--wall .tile__inner {
+  width: auto;
+  height: var(--unit);
+  aspect-ratio: var(--ar);
+  border-radius: 6px;
+}
+
+/* While a row is being handled, it stops drifting under the fingers. */
+.strip__track.is-held { animation-play-state: paused; }
+
+.strips__hint {
+  position: relative;
+  z-index: var(--z-stage);
+  margin-top: 1.5rem;
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ivory-faint);
+  transition: opacity 500ms var(--ease);
+}
+.strips__hint.is-gone { opacity: 0; }
+
+/* one framed memory ------------------------------------------------------ */
+.tile {
+  flex: 0 0 auto;
+  /* Spacing lives on the tile, not as a flex `gap`. A gap is only applied
+     *between* items, so the track's exact half-width would land half a gap
+     away from the clone and the loop would visibly jump. A uniform margin
+     makes every item the same width, so -50% lands on an identical frame. */
+  margin-right: var(--space, clamp(0.9rem, 2vw, 1.75rem));
+  animation: bob var(--bob, 9s) ease-in-out infinite alternate;
+  animation-delay: var(--bob-delay, 0s);
+}
+@keyframes bob {
+  from { transform: translate3d(0, calc(var(--bob-y, 10px) * -1), 0); }
+  to   { transform: translate3d(0, var(--bob-y, 10px), 0); }
+}
+
+.tile__inner {
+  position: relative;
+  width: var(--w);
+  aspect-ratio: var(--ar);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 8px;
+  background: var(--wine-800);
+  box-shadow:
+    0 26px 60px -26px rgba(0, 0, 0, 0.85),
+    0 0 0 6px rgba(255, 248, 243, 0.03);
+  transition: box-shadow 300ms var(--ease), border-color 300ms var(--ease), transform 300ms var(--ease);
+  cursor: pointer;
+}
+
+.tile__inner:hover,
+.tile__inner:focus-visible,
+.tile.is-active .tile__inner {
+  transform: scale(1.035);
+  border-color: #fff;
+  box-shadow:
+    0 30px 70px -24px rgba(0, 0, 0, 0.9),
+    0 0 0 6px rgba(249, 168, 196, 0.1),
+    0 0 46px rgba(249, 168, 196, 0.5);
+}
+
+.tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: kenburns var(--zoom, 26s) ease-in-out infinite alternate;
+  animation-delay: var(--bob-delay, 0s);
+}
+@keyframes kenburns {
+  from { transform: scale(1.01); }
+  to   { transform: scale(1.1); }
+}
+
+/* a whisper of warmth over every photo, so the strip reads as one piece */
+.tile__inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(34, 12, 26, 0) 45%, rgba(14, 4, 9, 0.72) 100%);
+}
+
+.tile__cap {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 1;
+  padding: 1.5rem 0.9rem 0.85rem;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--ivory);
+  text-shadow: 0 1px 10px rgba(14, 4, 9, 0.9);
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  transition: opacity 300ms var(--ease), transform 300ms var(--ease);
+}
+.tile__inner:hover .tile__cap,
+.tile__inner:focus-visible .tile__cap,
+.tile.is-active .tile__cap {
+  opacity: 1;
+  transform: none;
+}
+
+/* Size variants — mixing these is what makes a strip feel like a collage.
+   Every frame is a multiple of the strip's own --unit, so a whole row can be
+   scaled by changing one value (see .strip--compact). */
+.tile--sm     { --w: calc(var(--unit) * 0.76); --ar: 3 / 4; }
+.tile--md     { --w: var(--unit);              --ar: 4 / 5; }
+.tile--lg     { --w: calc(var(--unit) * 1.28); --ar: 4 / 5; }
+.tile--tall   { --w: calc(var(--unit) * 0.92); --ar: 2 / 3; }
+.tile--wide   { --w: calc(var(--unit) * 1.52); --ar: 16 / 10; }
+.tile--wideSm { --w: calc(var(--unit) * 1.16); --ar: 16 / 10; }
+
+/* With a large library, the per-tile float and zoom would promote hundreds of
+   elements to their own compositor layers and eat GPU memory. The strip is
+   already rich at that size, so the idle motion steps aside and the marquee
+   does the moving. Hover zoom is a transition, so it still works. */
+.strip__track--calm .tile,
+.strip__track--calm .tile img { animation: none; }
+
+/* ----------------------- 08 Hero message frame --------------------------- */
+.hero {
+  position: relative;
+  z-index: var(--z-stage);
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: center;
+  padding: clamp(4.5rem, 10vh, 7rem) 0 clamp(3rem, 8vh, 5rem);
+}
+
+.hero__center {
+  display: grid;
+  place-items: center;
+  padding: clamp(1.5rem, 5vh, 3.5rem) 1.25rem;
+}
+
+.frame {
+  position: relative;
+  max-width: 44rem;
+  padding: clamp(2.25rem, 6vw, 3.75rem) clamp(1.5rem, 5vw, 3.5rem);
+  text-align: center;
+  border: 1px solid var(--hairline-lit);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 248, 243, 0.08), rgba(255, 248, 243, 0.02));
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  backdrop-filter: blur(16px) saturate(120%);
+  box-shadow:
+    0 0 0 1px rgba(255, 248, 243, 0.06),
+    0 40px 120px -40px rgba(219, 39, 119, 0.65),
+    inset 0 1px 0 rgba(255, 248, 243, 0.26);
+}
+
+/* the delicate white glowing halo asked for around the message */
+.frame::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: 0 0 36px rgba(255, 248, 243, 0.26), 0 0 90px rgba(249, 168, 196, 0.2);
+  animation: breathe 7s ease-in-out infinite alternate;
+}
+@keyframes breathe {
+  from { opacity: 0.55; }
+  to   { opacity: 1; }
+}
+
+.frame__corner {
+  position: absolute;
+  width: 20px; height: 20px;
+  border: 1px solid var(--gold);
+  opacity: 0.75;
+}
+.frame__corner--tl { top: 10px;    left: 10px;  border-right: 0; border-bottom: 0; }
+.frame__corner--tr { top: 10px;    right: 10px; border-left: 0;  border-bottom: 0; }
+.frame__corner--bl { bottom: 10px; left: 10px;  border-right: 0; border-top: 0; }
+.frame__corner--br { bottom: 10px; right: 10px; border-left: 0;  border-top: 0; }
+
+.hero__headline {
+  font-size: clamp(2.6rem, 9.5vw, 5.25rem);
+  line-height: 1.16;
+  color: #fff;
+  text-shadow:
+    0 0 30px rgba(255, 248, 243, 0.45),
+    0 0 70px rgba(249, 168, 196, 0.45),
+    0 0 130px rgba(219, 39, 119, 0.4);
+  min-height: 1.2em;
+}
+
+.type__caret {
+  display: inline-block;
+  width: 2px;
+  height: 0.78em;
+  margin-left: 0.08em;
+  translate: 0 0.04em;
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold);
+  animation: blink 1.05s steps(2, start) infinite;
+}
+.type__caret.is-done { animation: fade-out 700ms var(--ease) forwards; }
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
+
+.hero__sub {
+  margin: 1.6rem auto 0;
+  max-width: 34rem;
+  font-size: clamp(1rem, 2.4vw, 1.1875rem);
+  font-style: italic;
+  font-weight: 300;
+  color: var(--ivory-dim);
+  opacity: 0;
+  transition: opacity 1200ms var(--ease) 180ms;
+}
+.hero__sub.is-in { opacity: 1; }
+
+/* sparkles pinned around the frame (added by main.js) */
+.spark {
+  position: absolute;
+  width: var(--s); height: var(--s);
+  top: var(--y); left: var(--x);
+  border-radius: 50%;
+  background: var(--ivory);
+  box-shadow: 0 0 9px rgba(255, 248, 243, 0.95), 0 0 18px rgba(249, 168, 196, 0.8);
+  opacity: 0;
+  animation: sparkle var(--dur) ease-in-out infinite;
+  animation-delay: var(--delay);
+  pointer-events: none;
+}
+@keyframes sparkle {
+  0%, 100% { opacity: 0;   transform: scale(0.4); }
+  50%      { opacity: 0.9; transform: scale(1); }
+}
+
+/* scroll cue ------------------------------------------------------------- */
+.scrollcue {
+  justify-self: center;
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  color: var(--gold);
+  opacity: 0.6;
+  transition: opacity 240ms var(--ease);
+}
+.scrollcue:hover { opacity: 1; }
+.scrollcue__line {
+  width: 1px;
+  height: 46px;
+  background: linear-gradient(180deg, transparent, var(--gold));
+}
+
+/* ------------------------------ 09 Letter -------------------------------- */
+.letter { text-align: center; }
+
+.letter__body {
+  display: grid;
+  gap: 1.5rem;
+}
+.letter__body p {
+  font-size: clamp(1.0625rem, 2.5vw, 1.25rem);
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--ivory-dim);
+  max-width: 62ch;
+  margin-inline: auto;
+}
+.letter__body p::first-letter { color: var(--blush); }
+
+.letter__sign {
+  margin-top: 2.5rem;
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  color: var(--gold);
+  text-shadow: 0 0 30px rgba(232, 201, 138, 0.4);
+}
+
+/* ----------------------------- 10 Memories ------------------------------- */
+.memories .wrap { text-align: center; }
+.memories .section__sub { margin-inline: auto; }
+/* The gap belongs between the heading and the wall — not between every row,
+   which would push the five rows apart and defeat the point of stacking them. */
+.memories .strips { margin-top: clamp(2.5rem, 7vh, 4rem); }
+
+/* ------------------------------ 11 Finale -------------------------------- */
+.finale {
+  text-align: center;
+  padding-bottom: clamp(7rem, 18vh, 11rem);
+}
+
+.finale__mark { color: var(--blush); margin-bottom: 1.75rem; opacity: 0.8; }
+
+.finale__heading {
+  font-size: clamp(2.1rem, 7vw, 3.75rem);
+  line-height: 1.3;
+  color: var(--ivory);
+  text-shadow: 0 0 40px rgba(249, 168, 196, 0.4), 0 0 90px rgba(219, 39, 119, 0.28);
+}
+
+.finale__sub {
+  margin-top: 1.5rem;
+  font-size: clamp(1.0625rem, 2.6vw, 1.3125rem);
+  font-style: italic;
+  color: var(--ivory-dim);
+}
+
+.finale__footer {
+  margin-top: 4rem;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ivory-faint);
+}
+
+/* ------------------------ 12 Floating controls --------------------------- */
+.controls {
+  position: fixed;
+  right: clamp(1rem, 3vw, 1.75rem);
+  bottom: clamp(1rem, 3vw, 1.75rem);
+  z-index: var(--z-controls);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: rgba(22, 7, 17, 0.55);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 18px 44px -20px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 248, 243, 0.1);
+  /* A fade, not a lift: the pill is centred with transform on phones and the
+     two would fight each other. */
+  animation: fade-in 900ms var(--ease) both;
+}
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.ctl {
+  display: grid;
+  place-items: center;
+  width: 44px;                 /* the 44×44 touch-target floor, exactly */
+  height: 44px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--ivory-dim);
+  background: transparent;
+  transition: color 200ms var(--ease), background-color 200ms var(--ease), border-color 200ms var(--ease);
+}
+.ctl:hover {
+  color: var(--ivory);
+  background: rgba(255, 248, 243, 0.1);
+  border-color: var(--hairline);
+}
+.ctl[aria-pressed="true"] { color: var(--gold); }
+
+.ctl__icon { grid-area: 1 / 1; }
+
+/* each button shows exactly one of its two icons */
+.ctl__icon--pause,
+.ctl__icon--muted,
+.ctl__icon--still { display: none; }
+
+#playBtn[aria-pressed="true"] .ctl__icon--play   { display: none; }
+#playBtn[aria-pressed="true"] .ctl__icon--pause  { display: block; }
+#muteBtn[aria-pressed="true"] .ctl__icon--sound  { display: none; }
+#muteBtn[aria-pressed="true"] .ctl__icon--muted  { display: block; }
+#motionBtn[aria-pressed="true"] .ctl__icon--motion { display: none; }
+#motionBtn[aria-pressed="true"] .ctl__icon--still  { display: block; }
+
+.controls__tip {
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: var(--blush);
+  transition: max-width 400ms var(--ease), padding 400ms var(--ease);
+}
+.controls__tip.is-on { max-width: 15rem; padding-right: 0.65rem; }
+
+/* ---------------------------- 13 Responsive ------------------------------ */
+@media (max-width: 760px) {
+  body { font-size: 1rem; }
+
+  .atmosphere__glow--blush { display: none; }   /* fewer blurs, smoother phones */
+
+  /* :not() keeps this off the wall rows, which set their own padding to 0. */
+  .strip:not(.strip--wall) { padding: 0.75rem 0; }
+  .tile { --space: 0.75rem; }
+
+  /* smaller frames so the rows still breathe on a phone */
+  .strip          { --unit: 145px; }
+  .strip--wall    { --unit: 150px; }
+
+  .tile__cap { font-size: 0.8125rem; padding: 1.2rem 0.7rem 0.7rem; }
+
+  .frame { border-radius: 12px; }
+  .scrollcue__line { height: 32px; }
+
+  .controls {
+    left: 0;
+    right: 0;
+    width: fit-content;
+    margin-inline: auto;
+  }
+  .controls__tip.is-on { max-width: 8rem; }
+}
+
+@media (max-width: 420px) {
+  .frame { padding: 1.9rem 1.25rem; }
+  .hero__headline { font-size: clamp(2.1rem, 11vw, 3rem); }
+}
+
+/* ------------------------- 14 Reduced motion ----------------------------- */
+/* Driven by the Reduce-motion control, and set automatically when the
+   operating system asks for it. Photos stay — only the movement stops. */
+.is-still .strip__track,
+.is-still .tile,
+.is-still .tile img,
+.is-still .atmosphere__glow,
+.is-still .star,
+.is-still .btn__shine,
+.is-still .frame::before,
+.is-still .gate__hint {
+  animation-play-state: paused;
+}
+
+.is-still .heart,
+.is-still .petal,
+.is-still .spark { display: none; }
+
+.is-still .reveal {
+  transition: opacity 260ms linear;
+  transform: none;
+}
+.is-still .reveal:not(.is-in) { transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  .strip__track, .tile, .tile img, .atmosphere__glow, .star, .btn__shine, .gate__hint {
+    animation-play-state: paused;
+  }
+  .heart, .petal, .spark { display: none; }
+  .reveal { transition: opacity 260ms linear; transform: none; }
+  .gate__inner, .controls { animation: none; }
+}
